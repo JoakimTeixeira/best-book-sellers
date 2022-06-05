@@ -9,3 +9,8 @@ datasource db {
     provider = "mongodb"
     url      = env("MONGODB_URL")
 }
+
+model Author {
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    name String @unique
+}
