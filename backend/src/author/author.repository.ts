@@ -7,10 +7,10 @@ import { CreateAuthorDto } from './dto/create-author.dto';
 export class AuthorRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  public doesExists(authorDto: CreateAuthorDto): Promise<Author> {
+  public isSameName(name: string): Promise<Author> {
     return this.prisma.author.findFirst({
       where: {
-        name: authorDto.name,
+        name,
       },
     });
   }

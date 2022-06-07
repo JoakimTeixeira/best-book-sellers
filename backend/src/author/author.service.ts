@@ -7,8 +7,8 @@ import { CreateAuthorDto } from './dto/create-author.dto';
 export class AuthorService {
   constructor(private readonly authorRepository: AuthorRepository) {}
 
-  public async doesAuthorExists(authorDto: CreateAuthorDto): Promise<Author> {
-    return await this.authorRepository.doesExists(authorDto);
+  public async isSameName(authorName: string): Promise<Author> {
+    return await this.authorRepository.isSameName(authorName);
   }
 
   public async createAuthor(authorDto: CreateAuthorDto): Promise<Author> {

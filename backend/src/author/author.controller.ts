@@ -28,8 +28,8 @@ export class AuthorController {
     @Body() createAuthorDto: CreateAuthorDto,
   ): Promise<Response> {
     try {
-      const doesAuthorExists = await this.authorService.doesAuthorExists(
-        createAuthorDto,
+      const doesAuthorExists = await this.authorService.isSameName(
+        createAuthorDto.name,
       );
 
       if (doesAuthorExists) {
