@@ -57,7 +57,7 @@ export class AuthorController {
       return await this.authorService.getAuthors();
     } catch {
       throw new InternalServerErrorException(
-        ' It was not possible to get authors',
+        'It was not possible to get authors',
       );
     }
   }
