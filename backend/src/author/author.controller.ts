@@ -8,7 +8,6 @@ import {
   Res,
   HttpStatus,
 } from '@nestjs/common';
-import { Author } from '@prisma/client';
 import { Response } from 'express';
 import { AuthorService } from './author.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
@@ -52,9 +51,17 @@ export class AuthorController {
   }
 
   @Get()
-  public async getAuthors(): Promise<Author[]> {
+  public async getAuthors(@Res() res: Response): Promise<Response> {
     try {
-      return await this.authorService.getAuthors();
+      const authors = await this.authorService.getAuthors();
+
+      if (authors) {
+        return res.status(HttpStatus.OK).send(authors);
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send({ message: 'No authors were found' });
+      }
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to get authors',
