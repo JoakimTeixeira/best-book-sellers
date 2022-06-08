@@ -32,7 +32,7 @@ export class AuthorRepository {
   public findOne(id: string): Promise<Author> {
     return this.prisma.author.findFirst({
       where: {
-        id: id,
+        id,
       },
     });
   }
