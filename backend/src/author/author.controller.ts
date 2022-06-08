@@ -63,9 +63,20 @@ export class AuthorController {
   }
 
   @Get(':id')
-  public async getAuthorById(@Param('id') id: string): Promise<Author> {
+  public async getAuthorById(
+    @Res() res: Response,
+    @Param('id') id: string,
+  ): Promise<Response> {
     try {
-      return await this.authorService.getAuthorById(id);
+      const author = await this.authorService.getAuthorById(id);
+
+      if (author) {
+        return res.status(HttpStatus.OK).send(author);
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send({ message: 'The author was not found' });
+      }
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to get the author',

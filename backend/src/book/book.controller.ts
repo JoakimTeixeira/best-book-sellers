@@ -68,9 +68,20 @@ export class BookController {
   }
 
   @Get(':id')
-  public async getBookById(@Param('id') id: string): Promise<Book> {
+  public async getBookById(
+    @Res() res: Response,
+    @Param('id') id: string,
+  ): Promise<Response> {
     try {
-      return await this.bookService.getBookById(id);
+      const book = await this.bookService.getBookById(id);
+
+      if (book) {
+        return res.status(HttpStatus.OK).send(book);
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send({ message: 'The book was not found' });
+      }
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to get the book',
