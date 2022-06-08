@@ -8,7 +8,6 @@ import {
   HttpStatus,
   Res,
 } from '@nestjs/common';
-import { Book } from '@prisma/client';
 import { Response } from 'express';
 import { AuthorService } from 'src/author/author.service';
 import { BookService } from './book.service';
@@ -25,7 +24,7 @@ export class BookController {
   public async createBook(
     @Res() res: Response,
     @Body() createBookDto: CreateBookDto,
-  ) {
+  ): Promise<Response> {
     try {
       const doesExists = await this.authorService.doesExists(
         createBookDto.authorId,
@@ -57,9 +56,17 @@ export class BookController {
   }
 
   @Get()
-  public async getBooks(): Promise<Book[]> {
+  public async getBooks(@Res() res: Response): Promise<Response> {
     try {
-      return await this.bookService.getBooks();
+      const books = await this.bookService.getBooks();
+
+      if (books) {
+        return res.status(HttpStatus.OK).send(books);
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .send({ message: 'No books were found' });
+      }
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to get books',

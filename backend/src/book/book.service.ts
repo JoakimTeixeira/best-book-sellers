@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Book } from '@prisma/client';
+import { IBookWithAuthor } from './book.interface';
 import { BookRepository } from './book.repository';
 import { CreateBookDto } from './dto/create-book.dto';
 
@@ -11,11 +11,11 @@ export class BookService {
     return await this.bookRepository.create(createBookDto);
   }
 
-  public async getBooks(): Promise<Book[]> {
+  public async getBooks(): Promise<IBookWithAuthor[]> {
     return await this.bookRepository.findAll();
   }
 
-  public async getBookById(id: string): Promise<Book> {
+  public async getBookById(id: string): Promise<IBookWithAuthor> {
     return await this.bookRepository.findOne(id);
   }
 }
