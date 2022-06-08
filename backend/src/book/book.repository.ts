@@ -8,13 +8,11 @@ export class BookRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   public create(bookDto: CreateBookDto): Promise<Book> {
-    const book = this.prisma.book.create({
+    return this.prisma.book.create({
       data: {
         ...bookDto,
       },
     });
-
-    return book;
   }
 
   public findAll(): Promise<Book[]> {

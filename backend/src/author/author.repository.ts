@@ -24,13 +24,11 @@ export class AuthorRepository {
   }
 
   public create(authorDto: CreateAuthorDto): Promise<Author> {
-    const author = this.prisma.author.create({
+    return this.prisma.author.create({
       data: {
         ...authorDto,
       },
     });
-
-    return author;
   }
 
   public findAll(): Promise<Author[]> {
