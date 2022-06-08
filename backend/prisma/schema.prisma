@@ -12,5 +12,14 @@ datasource db {
 
 model Author {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
-    name String @unique
+    name String
+    Book Book[]
+}
+
+model Book {
+    id          String  @id @default(auto()) @map("_id") @db.ObjectId
+    name        String
+    description String?
+    author      Author  @relation(fields: [authorId], references: [id])
+    authorId    String  @db.ObjectId
 }
