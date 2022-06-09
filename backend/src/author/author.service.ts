@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Author } from '@prisma/client';
+import { isNotEmpty } from 'class-validator';
 import { AuthorRepository } from './author.repository';
 import { CreateAuthorDto } from './dto/create-author.dto';
 
@@ -7,12 +8,16 @@ import { CreateAuthorDto } from './dto/create-author.dto';
 export class AuthorService {
   constructor(private readonly authorRepository: AuthorRepository) {}
 
-  public async doesExists(authorId: string): Promise<Author> {
-    return await this.authorRepository.doesExists(authorId);
+  public async doesExists(authorId: string): Promise<Boolean> {
+    return await this.authorRepository
+      .doesExists(authorId)
+      .then((author) => isNotEmpty(author));
   }
 
-  public async isSameName(authorName: string): Promise<Author> {
-    return await this.authorRepository.isSameName(authorName);
+  public async isSameName(authorName: string): Promise<Boolean> {
+    return await this.authorRepository
+      .isSameName(authorName)
+      .then((author) => isNotEmpty(author));
   }
 
   public async createAuthor(authorDto: CreateAuthorDto): Promise<Author> {

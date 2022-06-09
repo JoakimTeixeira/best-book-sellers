@@ -7,7 +7,9 @@ import {
   InternalServerErrorException,
   Res,
   HttpStatus,
+  ParseArrayPipe,
 } from '@nestjs/common';
+import { Author } from '@prisma/client';
 import { Response } from 'express';
 import { AuthorService } from './author.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
@@ -17,31 +19,53 @@ export interface IResponse {
   message: string;
   error: string;
 }
+
 @Controller('author')
 export class AuthorController {
   constructor(private readonly authorService: AuthorService) {}
 
   @Post()
   public async createAuthor(
-    @Res() res: Response,
-    @Body() createAuthorDto: CreateAuthorDto,
+    @Body(
+      new ParseArrayPipe({
+        items: CreateAuthorDto,
+        whitelist: true,
+      }),
+    )
+    createAuthorDto: CreateAuthorDto[],
+    @Res()
+    res: Response,
   ): Promise<Response> {
     try {
-      const doesAuthorExists = await this.authorService.isSameName(
-        createAuthorDto.name,
-      );
+      const createdAuthors: Author[] = [];
 
-      if (doesAuthorExists) {
-        return res.status(HttpStatus.CONFLICT).send({
-          message: 'Author already exists',
-        });
+      for (const author of createAuthorDto) {
+        if (!author.name) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            message: 'Some author fields are missing or invalid',
+          });
+        }
+
+        const doesAuthorExists = await this.authorService.isSameName(
+          author.name,
+        );
+
+        if (doesAuthorExists) {
+          return res.status(HttpStatus.CONFLICT).send({
+            message: 'Author already exists',
+            author,
+          });
+        }
+
+        const createdAuthor = await this.authorService.createAuthor(author);
+        createdAuthors.push(createdAuthor);
       }
 
-      const author = await this.authorService.createAuthor(createAuthorDto);
-
       return res.status(HttpStatus.OK).send({
-        message: 'Author has been created successfully',
-        author,
+        message: `${
+          createdAuthors.length > 1 ? 'Authors have' : 'Author has'
+        } been created successfully`,
+        createdAuthors,
       });
     } catch {
       throw new InternalServerErrorException(

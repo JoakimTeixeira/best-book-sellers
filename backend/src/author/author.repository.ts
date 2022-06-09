@@ -10,7 +10,7 @@ export class AuthorRepository {
   public doesExists(id: string): Promise<Author> {
     return this.prisma.author.findFirst({
       where: {
-        id: id,
+        id,
       },
     });
   }
