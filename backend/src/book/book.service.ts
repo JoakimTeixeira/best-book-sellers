@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Book } from '@prisma/client';
 import { IBookWithAuthor } from './book.interface';
 import { BookRepository } from './book.repository';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -7,7 +8,15 @@ import { CreateBookDto } from './dto/create-book.dto';
 export class BookService {
   constructor(private readonly bookRepository: BookRepository) {}
 
-  public async createBook(createBookDto: CreateBookDto) {
+  public async isSameBookNameForAuthor(
+    createBookDto: CreateBookDto,
+  ): Promise<Boolean> {
+    return await this.bookRepository
+      .isSameName(createBookDto)
+      .then((value) => value.length > 0);
+  }
+
+  public async createBook(createBookDto: CreateBookDto): Promise<Book> {
     return await this.bookRepository.create(createBookDto);
   }
 

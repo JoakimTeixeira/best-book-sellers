@@ -8,6 +8,25 @@ import { CreateBookDto } from './dto/create-book.dto';
 export class BookRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  public isSameName(bookDto: CreateBookDto) {
+    const { name, authorId } = bookDto;
+
+    return this.prisma.book.findMany({
+      where: {
+        AND: [
+          {
+            name,
+          },
+          {
+            author: {
+              id: authorId,
+            },
+          },
+        ],
+      },
+    });
+  }
+
   public create(bookDto: CreateBookDto): Promise<Book> {
     return this.prisma.book.create({
       data: {

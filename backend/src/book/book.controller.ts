@@ -7,9 +7,11 @@ import {
   InternalServerErrorException,
   HttpStatus,
   Res,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthorService } from 'src/author/author.service';
+import { IBookWithAuthor } from './book.interface';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 
@@ -21,33 +23,60 @@ export class BookController {
   ) {}
 
   @Post()
-  public async createBook(
-    @Res() res: Response,
-    @Body() createBookDto: CreateBookDto,
+  public async createBooks(
+    @Body(
+      new ParseArrayPipe({
+        items: CreateBookDto,
+        whitelist: true,
+      }),
+    )
+    createBookDto: CreateBookDto[],
+    @Res()
+    res: Response,
   ): Promise<Response> {
     try {
-      const doesExists = await this.authorService.doesExists(
-        createBookDto.authorId,
-      );
+      const createdBooks: IBookWithAuthor[] = [];
 
-      if (doesExists) {
-        const book = await this.bookService.createBook(createBookDto);
+      for (const book of createBookDto) {
+        const { name, authorId } = book;
 
-        if (book.name !== createBookDto.name) {
-          return res.status(HttpStatus.OK).send({
-            message: 'Author has been created successfully',
-            book,
-          });
-        } else {
-          return res.status(HttpStatus.CONFLICT).send({
-            message: 'Book name already exists for this author',
+        if (!name || !authorId) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            message: 'Some book fields are missing or invalid',
           });
         }
-      } else {
-        return res.status(HttpStatus.CONFLICT).send({
-          message: 'Book author does not exist',
-        });
+
+        const doesAuthorExists = await this.authorService.doesExists(
+          book.authorId,
+        );
+
+        if (doesAuthorExists) {
+          const isSameBookNameForAuthor =
+            await this.bookService.isSameBookNameForAuthor(book);
+
+          if (!isSameBookNameForAuthor) {
+            const createdBook = await this.bookService.createBook(book);
+            createdBooks.push(createdBook);
+          } else {
+            return res.status(HttpStatus.CONFLICT).send({
+              message: 'Book name already exists for this author',
+              book,
+            });
+          }
+        } else {
+          return res.status(HttpStatus.CONFLICT).send({
+            message: 'Book author does not exist',
+            book,
+          });
+        }
       }
+
+      return res.status(HttpStatus.OK).send({
+        message: `${
+          createdBooks.length > 1 ? 'Books have' : 'Book has'
+        } been created successfully`,
+        createdBooks,
+      });
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to create a new book',
