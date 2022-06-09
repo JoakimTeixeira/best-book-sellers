@@ -3,6 +3,7 @@ const theme = {
     background: 'white',
     text: 'black',
   },
+  font: '"Open Sans", sans-serif',
 }
 
 export default theme
