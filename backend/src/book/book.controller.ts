@@ -38,9 +38,9 @@ export class BookController {
       const createdBooks: IBookWithAuthor[] = [];
 
       for (const book of createBookDto) {
-        const { name, authorId } = book;
+        const { title, authorId } = book;
 
-        if (!name || !authorId) {
+        if (!title || !authorId) {
           return res.status(HttpStatus.BAD_REQUEST).send({
             message: 'Some book fields are missing or invalid',
           });
@@ -57,12 +57,12 @@ export class BookController {
           });
         }
 
-        const isSameBookNameForAuthor =
-          await this.bookService.isSameBookNameForAuthor(book);
+        const isSameBookTitleForAuthor =
+          await this.bookService.isSameBookTitleForAuthor(book);
 
-        if (isSameBookNameForAuthor) {
+        if (isSameBookTitleForAuthor) {
           return res.status(HttpStatus.CONFLICT).send({
-            message: 'Book name already exists for this author',
+            message: 'Book title already exists for this author',
             book,
           });
         }

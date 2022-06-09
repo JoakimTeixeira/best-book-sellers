@@ -4,7 +4,7 @@ export class CreateBookDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
-  name: string;
+  title: string;
 
   @IsString()
   @IsNotEmpty()

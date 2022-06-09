@@ -8,12 +8,12 @@ import { CreateBookDto } from './dto/create-book.dto';
 export class BookService {
   constructor(private readonly bookRepository: BookRepository) {}
 
-  public async isSameBookNameForAuthor(
+  public async isSameBookTitleForAuthor(
     createBookDto: CreateBookDto,
   ): Promise<Boolean> {
     return await this.bookRepository
-      .isSameName(createBookDto)
-      .then((value) => value.length > 0);
+      .isSameTitle(createBookDto)
+      .then((books) => books.length > 0);
   }
 
   public async createBook(createBookDto: CreateBookDto): Promise<Book> {

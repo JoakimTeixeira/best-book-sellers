@@ -8,14 +8,14 @@ import { CreateBookDto } from './dto/create-book.dto';
 export class BookRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  public isSameName(bookDto: CreateBookDto) {
-    const { name, authorId } = bookDto;
+  public isSameTitle(bookDto: CreateBookDto) {
+    const { title, authorId } = bookDto;
 
     return this.prisma.book.findMany({
       where: {
         AND: [
           {
-            name,
+            title,
           },
           {
             author: {
@@ -39,7 +39,7 @@ export class BookRepository {
     return this.prisma.book.findMany({
       select: {
         id: true,
-        name: true,
+        title: true,
         description: true,
         author: true,
       },
@@ -53,7 +53,7 @@ export class BookRepository {
       },
       select: {
         id: true,
-        name: true,
+        title: true,
         description: true,
         author: true,
       },
