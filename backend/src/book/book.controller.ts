@@ -50,25 +50,25 @@ export class BookController {
           book.authorId,
         );
 
-        if (doesAuthorExists) {
-          const isSameBookNameForAuthor =
-            await this.bookService.isSameBookNameForAuthor(book);
-
-          if (!isSameBookNameForAuthor) {
-            const createdBook = await this.bookService.createBook(book);
-            createdBooks.push(createdBook);
-          } else {
-            return res.status(HttpStatus.CONFLICT).send({
-              message: 'Book name already exists for this author',
-              book,
-            });
-          }
-        } else {
+        if (!doesAuthorExists) {
           return res.status(HttpStatus.CONFLICT).send({
             message: 'Book author does not exist',
             book,
           });
         }
+
+        const isSameBookNameForAuthor =
+          await this.bookService.isSameBookNameForAuthor(book);
+
+        if (isSameBookNameForAuthor) {
+          return res.status(HttpStatus.CONFLICT).send({
+            message: 'Book name already exists for this author',
+            book,
+          });
+        }
+
+        const createdBook = await this.bookService.createBook(book);
+        createdBooks.push(createdBook);
       }
 
       return res.status(HttpStatus.OK).send({
@@ -89,13 +89,13 @@ export class BookController {
     try {
       const books = await this.bookService.getBooks();
 
-      if (books) {
-        return res.status(HttpStatus.OK).send(books);
-      } else {
+      if (!books) {
         return res
           .status(HttpStatus.NOT_FOUND)
           .send({ message: 'No books were found' });
       }
+
+      return res.status(HttpStatus.OK).send(books);
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to get books',
@@ -111,13 +111,13 @@ export class BookController {
     try {
       const book = await this.bookService.getBookById(id);
 
-      if (book) {
-        return res.status(HttpStatus.OK).send(book);
-      } else {
+      if (!book) {
         return res
           .status(HttpStatus.NOT_FOUND)
           .send({ message: 'The book was not found' });
       }
+
+      return res.status(HttpStatus.OK).send(book);
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to get the book',
