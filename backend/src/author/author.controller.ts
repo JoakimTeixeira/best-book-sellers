@@ -88,7 +88,7 @@ export class AuthorController {
       return res.status(HttpStatus.OK).send(authors);
     } catch {
       throw new InternalServerErrorException(
-        'It was not possible to get authors',
+        'It was not possible to get the authors',
       );
     }
   }

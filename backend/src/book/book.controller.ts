@@ -98,7 +98,7 @@ export class BookController {
       return res.status(HttpStatus.OK).send(books);
     } catch {
       throw new InternalServerErrorException(
-        'It was not possible to get books',
+        'It was not possible to get the books',
       );
     }
   }
