@@ -79,13 +79,13 @@ export class AuthorController {
     try {
       const authors = await this.authorService.getAuthors();
 
-      if (authors) {
-        return res.status(HttpStatus.OK).send(authors);
-      } else {
+      if (!authors) {
         return res
           .status(HttpStatus.NOT_FOUND)
           .send({ message: 'No authors were found' });
       }
+
+      return res.status(HttpStatus.OK).send(authors);
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to get authors',
@@ -101,13 +101,13 @@ export class AuthorController {
     try {
       const author = await this.authorService.getAuthorById(id);
 
-      if (author) {
-        return res.status(HttpStatus.OK).send(author);
-      } else {
+      if (!author) {
         return res
           .status(HttpStatus.NOT_FOUND)
           .send({ message: 'The author was not found' });
       }
+
+      return res.status(HttpStatus.OK).send(author);
     } catch {
       throw new InternalServerErrorException(
         'It was not possible to get the author',
